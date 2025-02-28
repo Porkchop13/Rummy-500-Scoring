@@ -81,11 +81,25 @@ export function usePlayerProfiles() {
     });
   }, []);
 
+  const clearAllStats = useCallback(() => {
+    setProfiles(current => {
+      const updatedProfiles = { ...current };
+      Object.keys(updatedProfiles).forEach(profileId => {
+        updatedProfiles[profileId] = {
+          ...updatedProfiles[profileId],
+          stats: createInitialStats(),
+        };
+      });
+      return updatedProfiles;
+    });
+  }, []);
+
   return {
     profiles,
     addProfile,
     updateProfile,
     updateProfileStats,
     deleteProfile,
+    clearAllStats,
   };
 }

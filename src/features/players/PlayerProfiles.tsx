@@ -1,9 +1,9 @@
-import { PlusIcon, TrashIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon, PlusIcon, TrashIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { useRef, useState } from 'react';
 import { usePlayerProfiles } from './use-player-profiles';
 
 export function PlayerProfiles() {
-  const { profiles, addProfile, deleteProfile, updateProfile } = usePlayerProfiles();
+  const { profiles, addProfile, deleteProfile, updateProfile, clearAllStats } = usePlayerProfiles();
   const [newPlayerName, setNewPlayerName] = useState('');
   const [newPlayerColor, setNewPlayerColor] = useState('#6366f1'); // Default indigo color
   const inputRef = useRef<HTMLInputElement>(null);
@@ -24,10 +24,24 @@ export function PlayerProfiles() {
     }
   };
 
+  const handleClearStats = () => {
+    if (window.confirm('Are you sure you want to reset all player statistics? This cannot be undone.')) {
+      clearAllStats();
+    }
+  };
+
   return (
     <div className="mx-auto max-w-2xl space-y-6 p-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold dark:text-white">Player Profiles</h2>
+        <button
+          onClick={handleClearStats}
+          className="inline-flex items-center rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
+          title="Reset all player statistics"
+        >
+          <ArrowPathIcon className="mr-2 h-5 w-5" />
+          Reset Stats
+        </button>
       </div>
 
       <form onSubmit={handleAddProfile} className="flex gap-2">
