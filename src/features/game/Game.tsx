@@ -54,11 +54,13 @@ export function Game() {
 
     // Check if game is over and update profiles
     const totalScores = getTotalScores(newGame);
-    const playersOver500 = Object.entries(totalScores).filter(([_, score]) => score >= WINNING_SCORE);
+    const playersOver500 = Object.entries(totalScores)
+      .filter(([_, score]) => score >= WINNING_SCORE)
+      .sort(([, a], [, b]) => b - a); // Sort by score descending
 
-    if (playersOver500.length > 0) {
-      // Find the player with the highest score
-      const winningEntry = playersOver500.reduce((highest, current) => (current[1] > highest[1] ? current : highest));
+    // Only end the game if there's one clear winner
+    if (playersOver500.length === 1 || (playersOver500.length > 1 && playersOver500[0][1] > playersOver500[1][1])) {
+      const winningEntry = playersOver500[0];
       const winningPlayer = game.players.find(p => p.id === winningEntry[0]);
       if (winningPlayer) {
         setWinner({
@@ -205,19 +207,16 @@ export function Game() {
           return (
             <div key={player.id} className="rounded bg-gray-50 p-4 shadow-sm dark:bg-gray-800">
               <div className="flex items-center gap-2">
-                <UserCircleIcon 
-                  className="h-5 w-5" 
-                  style={{ color: player.color || '#9ca3af' }}
-                />
+                <UserCircleIcon className="h-5 w-5" style={{ color: player.color || '#9ca3af' }} />
                 <h3 className="font-semibold dark:text-white">{player.name}</h3>
               </div>
               <p className="mb-2 text-2xl dark:text-white">{score}</p>
               <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                 <div
                   className="absolute h-full rounded-full transition-all duration-500 ease-out"
-                  style={{ 
+                  style={{
                     width: `${progressPercent}%`,
-                    backgroundColor: player.color || '#2563eb'
+                    backgroundColor: player.color || '#2563eb',
                   }}
                 />
               </div>
@@ -319,8 +318,8 @@ export function Game() {
                 <div className="grid grid-cols-2 gap-2">
                   {game.players.map(player => (
                     <div key={player.id} className="flex items-center gap-2 dark:text-gray-300">
-                      <span 
-                        className="inline-block h-2 w-2 rounded-full" 
+                      <span
+                        className="inline-block h-2 w-2 rounded-full"
                         style={{ backgroundColor: player.color || '#9ca3af' }}
                       />
                       {player.name}: {round.scores[player.id] || 0}

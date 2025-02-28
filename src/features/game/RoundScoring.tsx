@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Player } from './types';
 
 interface RoundScoringProps {
@@ -19,6 +19,7 @@ export function RoundScoring({
   roundNumber,
 }: RoundScoringProps) {
   const [scores, setScores] = useState<Record<string, number>>({});
+  const firstInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (initialScores) {
@@ -31,6 +32,8 @@ export function RoundScoring({
     onScoreSubmit(scores);
     if (!isEditing) {
       setScores({});
+      // Focus the first input after clearing scores
+      firstInputRef.current?.focus();
     }
   };
 
@@ -48,7 +51,7 @@ export function RoundScoring({
         {isEditing ? `Edit Round ${roundNumber} Scores` : 'New Round'}
       </h3>
       <div className="grid gap-4 sm:grid-cols-2">
-        {players.map(player => (
+        {players.map((player, index) => (
           <div key={player.id} className="space-y-2">
             <label
               htmlFor={`score-${player.id}`}
@@ -61,6 +64,7 @@ export function RoundScoring({
               {player.name}
             </label>
             <input
+              ref={index === 0 ? firstInputRef : undefined}
               type="number"
               id={`score-${player.id}`}
               value={scores[player.id] || ''}
