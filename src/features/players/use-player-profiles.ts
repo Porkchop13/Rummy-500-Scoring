@@ -26,10 +26,11 @@ export function usePlayerProfiles() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
   }, [profiles]);
 
-  const addProfile = useCallback((name: string) => {
+  const addProfile = useCallback((name: string, color?: string) => {
     const newProfile: PlayerProfile = {
       id: crypto.randomUUID(),
       name,
+      color,
       stats: createInitialStats(),
       createdAt: new Date().toISOString(),
     };
@@ -40,6 +41,13 @@ export function usePlayerProfiles() {
     }));
 
     return newProfile;
+  }, []);
+
+  const updateProfile = useCallback((profileId: string, updatedProfile: PlayerProfile) => {
+    setProfiles(current => ({
+      ...current,
+      [profileId]: updatedProfile,
+    }));
   }, []);
 
   const updateProfileStats = useCallback((profileId: string, gameScore: number, isWinner: boolean) => {
@@ -76,6 +84,7 @@ export function usePlayerProfiles() {
   return {
     profiles,
     addProfile,
+    updateProfile,
     updateProfileStats,
     deleteProfile,
   };

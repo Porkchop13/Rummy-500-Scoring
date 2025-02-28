@@ -2,6 +2,7 @@ export interface Player {
   id: string;
   name: string;
   profileId?: string; // Optional reference to a player profile
+  color?: string; // Player's color from their profile
 }
 
 export interface Round {

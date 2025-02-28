@@ -50,7 +50,14 @@ export function RoundScoring({
       <div className="grid gap-4 sm:grid-cols-2">
         {players.map(player => (
           <div key={player.id} className="space-y-2">
-            <label htmlFor={`score-${player.id}`} className="mb-2 block text-lg font-medium dark:text-gray-300">
+            <label
+              htmlFor={`score-${player.id}`}
+              className="mb-2 flex items-center gap-2 text-lg font-medium dark:text-gray-300"
+            >
+              <span
+                className="inline-block h-3 w-3 rounded-full"
+                style={{ backgroundColor: player.color || '#9ca3af' }}
+              />
               {player.name}
             </label>
             <input
@@ -62,6 +69,10 @@ export function RoundScoring({
               min="0"
               step="5"
               required
+              style={{
+                borderColor: player.color || 'var(--tw-border-opacity)',
+                borderWidth: '2px',
+              }}
             />
           </div>
         ))}

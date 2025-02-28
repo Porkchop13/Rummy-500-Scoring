@@ -20,6 +20,7 @@ export function NewGame({ onGameStart }: NewGameProps) {
       id: profileId || crypto.randomUUID(),
       name: name.trim(),
       profileId, // Store the profile ID if the player was selected from profiles
+      color: profileId ? profiles[profileId]?.color : undefined,
     };
 
     setPlayers([...players, newPlayer]);
@@ -54,7 +55,7 @@ export function NewGame({ onGameStart }: NewGameProps) {
                 onClick={() => addPlayer(profile.name, profile.id)}
                 className="flex items-center space-x-2 rounded-md border border-gray-300 p-2 text-left hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
               >
-                <UserCircleIcon className="h-5 w-5 text-gray-400" />
+                <UserCircleIcon className="h-5 w-5" style={{ color: profile.color || '#9ca3af' }} />
                 <span className="dark:text-white">{profile.name}</span>
               </button>
             ))}
@@ -100,7 +101,7 @@ export function NewGame({ onGameStart }: NewGameProps) {
                 className="flex items-center justify-between rounded-md bg-white p-2 shadow dark:bg-gray-800"
               >
                 <div className="flex items-center space-x-2">
-                  <UserCircleIcon className="h-5 w-5 text-gray-400" />
+                  <UserCircleIcon className="h-5 w-5" style={{ color: player.color || '#9ca3af' }} />
                   <span className="dark:text-white">{player.name}</span>
                 </div>
                 <button

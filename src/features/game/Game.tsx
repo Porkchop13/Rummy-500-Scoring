@@ -1,4 +1,4 @@
-import { ChartBarIcon, PlusCircleIcon, TrophyIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon, PlusCircleIcon, TrophyIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -114,7 +114,7 @@ export function Game() {
       return {
         label: player.name,
         data,
-        borderColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
+        borderColor: player.color || `hsl(${Math.random() * 360}, 70%, 50%)`,
         tension: 0.1,
       };
     });
@@ -204,12 +204,21 @@ export function Game() {
 
           return (
             <div key={player.id} className="rounded bg-gray-50 p-4 shadow-sm dark:bg-gray-800">
-              <h3 className="font-semibold dark:text-white">{player.name}</h3>
+              <div className="flex items-center gap-2">
+                <UserCircleIcon 
+                  className="h-5 w-5" 
+                  style={{ color: player.color || '#9ca3af' }}
+                />
+                <h3 className="font-semibold dark:text-white">{player.name}</h3>
+              </div>
               <p className="mb-2 text-2xl dark:text-white">{score}</p>
               <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                 <div
-                  className="absolute h-full rounded-full bg-blue-600 transition-all duration-500 ease-out dark:bg-blue-500"
-                  style={{ width: `${progressPercent}%` }}
+                  className="absolute h-full rounded-full transition-all duration-500 ease-out"
+                  style={{ 
+                    width: `${progressPercent}%`,
+                    backgroundColor: player.color || '#2563eb'
+                  }}
                 />
               </div>
             </div>
@@ -309,7 +318,11 @@ export function Game() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   {game.players.map(player => (
-                    <div key={player.id} className="dark:text-gray-300">
+                    <div key={player.id} className="flex items-center gap-2 dark:text-gray-300">
+                      <span 
+                        className="inline-block h-2 w-2 rounded-full" 
+                        style={{ backgroundColor: player.color || '#9ca3af' }}
+                      />
                       {player.name}: {round.scores[player.id] || 0}
                     </div>
                   ))}
