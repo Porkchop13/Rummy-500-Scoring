@@ -27,7 +27,7 @@ export function Game() {
   const [showNewGameConfirm, setShowNewGameConfirm] = useState(false);
   const [showChart, setShowChart] = useState(false);
   const [winner, setWinner] = useState<{ name: string; score: number } | null>(null);
-  const { updateProfileStats } = usePlayerProfiles();
+  const { updateProfileStats, updateRoundStats } = usePlayerProfiles();
 
   const handleGameStart = (players: Player[]) => {
     const newGame: GameType = {
@@ -41,6 +41,14 @@ export function Game() {
 
   const handleRoundSubmit = (scores: Record<string, number>) => {
     if (!game) return;
+
+    // Track round scores for each player profile
+    game.players.forEach(player => {
+      if (player.profileId) {
+        // Update player profile with round score
+        updateRoundStats(player.profileId, scores[player.id] || 0);
+      }
+    });
 
     const newRound: Round = {
       id: crypto.randomUUID(),
@@ -62,20 +70,54 @@ export function Game() {
     if (playersOver500.length === 1 || (playersOver500.length > 1 && playersOver500[0][1] > playersOver500[1][1])) {
       const winningEntry = playersOver500[0];
       const winningPlayer = game.players.find(p => p.id === winningEntry[0]);
+      const winningScore = winningEntry[1];
+
+      // Calculate margin of victory
+      const secondHighestScore =
+        playersOver500.length > 1
+          ? playersOver500[1][1]
+          : Math.max(
+              ...Object.entries(totalScores)
+                .filter(([id]) => id !== winningEntry[0])
+                .map(([, score]) => score)
+            );
+
+      const marginOfVictory = winningScore - secondHighestScore;
+
       if (winningPlayer) {
         setWinner({
           name: winningPlayer.name,
-          score: winningEntry[1],
+          score: winningScore,
         });
       }
 
+      // Update final game stats for all players
       game.players.forEach(player => {
         if (player.profileId) {
           const finalScore = totalScores[player.id];
           const isWinner = player.id === winningEntry[0];
-          updateProfileStats(player.profileId, finalScore, isWinner);
+
+          // Get total round count and total round scores
+          const roundsCount = game.rounds.length + 1; // Include current round
+          const totalRoundScore = game.rounds.reduce(
+            (sum, round) => sum + (round.scores[player.id] || 0),
+            scores[player.id] || 0 // Add current round score
+          );
+
+          // Update player profile with final game stats
+          updateProfileStats(
+            player.profileId,
+            finalScore,
+            isWinner,
+            roundsCount,
+            totalRoundScore,
+            isWinner ? marginOfVictory : 0
+          );
         }
       });
+
+      // Mark game as ended
+      newGame.dateEnded = new Date().toISOString();
     }
 
     setGame(newGame);
@@ -83,10 +125,33 @@ export function Game() {
 
   const handleRoundUpdate = (roundId: string, newScores: Record<string, number>) => {
     if (!game) return;
+
+    // Get the original round scores
+    const originalRound = game.rounds.find(round => round.id === roundId);
+
+    if (originalRound) {
+      // Update player round stats
+      game.players.forEach(player => {
+        if (player.profileId) {
+          // Subtract old score and add new score
+          const oldScore = originalRound.scores[player.id] || 0;
+          const newScore = newScores[player.id] || 0;
+
+          if (oldScore !== newScore) {
+            // Remove old score
+            updateRoundStats(player.profileId, -oldScore);
+            // Add new score
+            updateRoundStats(player.profileId, newScore);
+          }
+        }
+      });
+    }
+
     setGame({
       ...game,
       rounds: game.rounds.map(round => (round.id === roundId ? { ...round, scores: newScores } : round)),
     });
+
     setEditingRoundId(null);
   };
 

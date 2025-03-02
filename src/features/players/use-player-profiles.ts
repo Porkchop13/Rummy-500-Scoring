@@ -9,12 +9,49 @@ const createInitialStats = (): PlayerStats => ({
   totalScore: 0,
   averageScore: 0,
   highestScore: 0,
+  roundsPlayed: 0,
+  totalRoundScore: 0,
+  averageRoundScore: 0,
+  marginOfVictory: 0,
+  gamesWithMargin: 0,
 });
 
 // Load initial profiles from localStorage
 const loadStoredProfiles = (): PlayerProfiles => {
   const stored = localStorage.getItem(STORAGE_KEY);
-  return stored ? JSON.parse(stored) : {};
+
+  if (!stored) return {};
+
+  // Handle migration of old profiles that don't have the new stats fields
+  let profiles: PlayerProfiles = JSON.parse(stored);
+
+  // Check if we need to migrate profile data
+  let needsMigration = false;
+
+  Object.values(profiles).forEach(profile => {
+    if (profile.stats.roundsPlayed === undefined) {
+      needsMigration = true;
+    }
+  });
+
+  if (needsMigration) {
+    Object.keys(profiles).forEach(id => {
+      const profile = profiles[id];
+      profiles[id] = {
+        ...profile,
+        stats: {
+          ...profile.stats,
+          roundsPlayed: 0,
+          totalRoundScore: 0,
+          averageRoundScore: 0,
+          marginOfVictory: 0,
+          gamesWithMargin: 0,
+        },
+      };
+    });
+  }
+
+  return profiles;
 };
 
 export function usePlayerProfiles() {
@@ -50,25 +87,68 @@ export function usePlayerProfiles() {
     }));
   }, []);
 
-  const updateProfileStats = useCallback((profileId: string, gameScore: number, isWinner: boolean) => {
+  const updateProfileStats = useCallback(
+    (
+      profileId: string,
+      gameScore: number,
+      isWinner: boolean,
+      roundsCount: number = 0,
+      totalRoundScore: number = 0,
+      marginOfVictory: number = 0
+    ) => {
+      setProfiles(current => {
+        const profile = current[profileId];
+        if (!profile) return current;
+
+        const newStats = {
+          gamesPlayed: profile.stats.gamesPlayed + 1,
+          gamesWon: profile.stats.gamesWon + (isWinner ? 1 : 0),
+          totalScore: profile.stats.totalScore + gameScore,
+          highestScore: Math.max(profile.stats.highestScore, gameScore),
+          averageScore: Math.round((profile.stats.totalScore + gameScore) / (profile.stats.gamesPlayed + 1)),
+          roundsPlayed: profile.stats.roundsPlayed + roundsCount,
+          totalRoundScore: profile.stats.totalRoundScore + totalRoundScore,
+          averageRoundScore:
+            roundsCount > 0
+              ? Math.round(
+                  (profile.stats.totalRoundScore + totalRoundScore) / (profile.stats.roundsPlayed + roundsCount)
+                )
+              : profile.stats.averageRoundScore,
+          marginOfVictory: profile.stats.marginOfVictory + (isWinner ? marginOfVictory : 0),
+          gamesWithMargin: profile.stats.gamesWithMargin + (isWinner && marginOfVictory > 0 ? 1 : 0),
+        };
+
+        return {
+          ...current,
+          [profileId]: {
+            ...profile,
+            stats: newStats,
+            lastPlayed: new Date().toISOString(),
+          },
+        };
+      });
+    },
+    []
+  );
+
+  const updateRoundStats = useCallback((profileId: string, roundScore: number) => {
     setProfiles(current => {
       const profile = current[profileId];
       if (!profile) return current;
 
-      const newStats = {
-        gamesPlayed: profile.stats.gamesPlayed + 1,
-        gamesWon: profile.stats.gamesWon + (isWinner ? 1 : 0),
-        totalScore: profile.stats.totalScore + gameScore,
-        highestScore: Math.max(profile.stats.highestScore, gameScore),
-        averageScore: Math.round((profile.stats.totalScore + gameScore) / (profile.stats.gamesPlayed + 1)),
-      };
+      const newTotalRoundScore = profile.stats.totalRoundScore + roundScore;
+      const newRoundsPlayed = profile.stats.roundsPlayed + 1;
 
       return {
         ...current,
         [profileId]: {
           ...profile,
-          stats: newStats,
-          lastPlayed: new Date().toISOString(),
+          stats: {
+            ...profile.stats,
+            roundsPlayed: newRoundsPlayed,
+            totalRoundScore: newTotalRoundScore,
+            averageRoundScore: Math.round(newTotalRoundScore / newRoundsPlayed),
+          },
         },
       };
     });
@@ -99,6 +179,7 @@ export function usePlayerProfiles() {
     addProfile,
     updateProfile,
     updateProfileStats,
+    updateRoundStats,
     deleteProfile,
     clearAllStats,
   };
