@@ -9,6 +9,7 @@ A simple, user-friendly application to track scores for Rummy 500 card games.
 - View cumulative scores and rankings
 - Track game history
 - Persist game data using local storage
+- Peer-to-peer multiplayer support using WebRTC and a signaling server
 
 ## Tech Stack
 
@@ -41,6 +42,12 @@ A simple, user-friendly application to track scores for Rummy 500 card games.
    npm run dev
    ```
 
+4. Set up and run the signaling server:
+
+   ```
+   node src/features/multiplayer/SignalingServer.ts
+   ```
+
 ## Usage
 
 1. Add player names to start a new game
@@ -48,6 +55,7 @@ A simple, user-friendly application to track scores for Rummy 500 card games.
 3. View the scoreboard to track progress
 4. End the game when finished
 5. Review game history
+6. Initiate a multiplayer game and connect to the signaling server
 
 ## Project Structure
 
@@ -58,7 +66,8 @@ src/
 ├── features/         # Feature modules
 │   ├── game/         # Game management
 │   ├── players/      # Player management
-│   └── scoring/      # Score tracking
+│   ├── scoring/      # Score tracking
+│   ├── multiplayer/  # Multiplayer support
 └── utils/            # Utility functions
 ```
 
