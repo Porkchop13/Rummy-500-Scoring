@@ -15,6 +15,7 @@ import { usePlayerProfiles } from '../players/use-player-profiles';
 import { NewGame } from './NewGame';
 import { RoundScoring } from './RoundScoring';
 import { Game as GameType, Player, Round } from './types';
+import { useMultiplayer } from '../multiplayer/MultiplayerContext';
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -28,6 +29,7 @@ export function Game() {
   const [showChart, setShowChart] = useState(false);
   const [winner, setWinner] = useState<{ name: string; score: number } | null>(null);
   const { updateProfileStats, updateRoundStats } = usePlayerProfiles();
+  const { sendGameState, gameState } = useMultiplayer();
 
   const handleGameStart = (players: Player[]) => {
     const newGame: GameType = {
@@ -121,6 +123,7 @@ export function Game() {
     }
 
     setGame(newGame);
+    sendGameState(newGame);
   };
 
   const handleRoundUpdate = (roundId: string, newScores: Record<string, number>) => {
@@ -147,12 +150,14 @@ export function Game() {
       });
     }
 
-    setGame({
+    const updatedGame = {
       ...game,
       rounds: game.rounds.map(round => (round.id === roundId ? { ...round, scores: newScores } : round)),
-    });
+    };
 
+    setGame(updatedGame);
     setEditingRoundId(null);
+    sendGameState(updatedGame);
   };
 
   const getTotalScores = (gameState = game) => {
