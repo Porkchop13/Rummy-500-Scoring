@@ -42,13 +42,13 @@ export function NewGame({ onGameStart }: NewGameProps) {
   const availableProfiles = Object.values(profiles).filter(profile => !players.some(p => p.profileId === profile.id));
 
   return (
-    <div className="mx-auto max-w-md space-y-6 p-6">
+    <div className="mx-auto max-w-md space-y-6">
       <h2 className="text-2xl font-bold dark:text-white">New Game</h2>
 
       {availableProfiles.length > 0 && (
         <div>
           <h3 className="mb-2 font-medium dark:text-white">Select from profiles:</h3>
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {availableProfiles.map(profile => (
               <button
                 key={profile.id}
@@ -56,7 +56,7 @@ export function NewGame({ onGameStart }: NewGameProps) {
                 className="flex items-center space-x-2 rounded-md border border-gray-300 p-2 text-left hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
               >
                 <UserCircleIcon className="h-5 w-5" style={{ color: profile.color || '#9ca3af' }} />
-                <span className="dark:text-white">{profile.name}</span>
+                <span className="truncate dark:text-white">{profile.name}</span>
               </button>
             ))}
           </div>
@@ -70,7 +70,7 @@ export function NewGame({ onGameStart }: NewGameProps) {
             e.preventDefault();
             addPlayer(newPlayerName);
           }}
-          className="flex gap-2"
+          className="flex flex-col gap-2 sm:flex-row"
         >
           <input
             ref={inputRef}
@@ -83,7 +83,7 @@ export function NewGame({ onGameStart }: NewGameProps) {
           <button
             type="submit"
             disabled={!newPlayerName.trim()}
-            className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
           >
             <PlusIcon className="mr-2 h-5 w-5" />
             Add
@@ -100,13 +100,13 @@ export function NewGame({ onGameStart }: NewGameProps) {
                 key={player.id}
                 className="flex items-center justify-between rounded-md bg-white p-2 shadow dark:bg-gray-800"
               >
-                <div className="flex items-center space-x-2">
-                  <UserCircleIcon className="h-5 w-5" style={{ color: player.color || '#9ca3af' }} />
-                  <span className="dark:text-white">{player.name}</span>
+                <div className="flex items-center space-x-2 overflow-hidden">
+                  <UserCircleIcon className="h-5 w-5 flex-shrink-0" style={{ color: player.color || '#9ca3af' }} />
+                  <span className="truncate dark:text-white">{player.name}</span>
                 </div>
                 <button
                   onClick={() => removePlayer(player.id)}
-                  className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+                  className="flex-shrink-0 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
                 >
                   <TrashIcon className="h-5 w-5" />
                 </button>

@@ -72,12 +72,52 @@ export function PlayerStats() {
     ],
   };
 
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(156, 163, 175, 0.1)',
+        },
+        ticks: {
+          color: 'rgb(156, 163, 175)',
+        },
+      },
+      x: {
+        grid: {
+          color: 'rgba(156, 163, 175, 0.1)',
+        },
+        ticks: {
+          color: 'rgb(156, 163, 175)',
+          font: {
+            size: 10,
+          },
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        position: 'bottom' as const, // Type assertion to fix the error
+        labels: {
+          boxWidth: 12,
+          padding: 8,
+          color: 'rgb(156, 163, 175)',
+          font: {
+            size: 11,
+          },
+        },
+      },
+    },
+  } as const; // Make the entire object constant to preserve literal types
+
   return (
-    <div className="mx-auto max-w-4xl space-y-8 p-6">
+    <div className="mx-auto max-w-4xl space-y-6">
       <h2 className="text-2xl font-bold dark:text-white">Player Statistics</h2>
 
       {playersList.length === 0 ? (
-        <div className="rounded-lg bg-white p-8 text-center shadow dark:bg-gray-800">
+        <div className="rounded-lg bg-white p-6 text-center shadow sm:p-8 dark:bg-gray-800">
           <p className="text-gray-600 dark:text-gray-300">No player profiles created yet.</p>
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
             Create player profiles to see statistics here.
@@ -85,21 +125,24 @@ export function PlayerStats() {
         </div>
       ) : (
         <>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {rankedPlayers.map((player, index) => (
-              <div key={player.id} className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    {index === 0 && <TrophyIcon className="h-5 w-5 text-yellow-400" />}
-                    <UserCircleIcon className="h-6 w-6" style={{ color: player.color || '#9ca3af' }} />
-                    <h3 className="font-medium text-gray-900 dark:text-white">{player.name}</h3>
+              <div key={player.id} className="rounded-lg bg-white p-4 shadow sm:p-6 dark:bg-gray-800">
+                <div className="mb-3 flex items-center justify-between sm:mb-4">
+                  <div className="flex min-w-0 items-center space-x-2 overflow-hidden">
+                    {index === 0 && <TrophyIcon className="h-5 w-5 flex-shrink-0 text-yellow-400" />}
+                    <UserCircleIcon
+                      className="h-5 w-5 flex-shrink-0 sm:h-6 sm:w-6"
+                      style={{ color: player.color || '#9ca3af' }}
+                    />
+                    <h3 className="truncate font-medium text-gray-900 dark:text-white">{player.name}</h3>
                   </div>
                   <div className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-300">
                     Rank #{index + 1}
                   </div>
                 </div>
 
-                <div className="space-y-2 text-sm">
+                <div className="space-y-1 text-xs sm:space-y-2 sm:text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-500 dark:text-gray-400">Record:</span>
                     <span className="font-medium dark:text-white">
@@ -148,7 +191,7 @@ export function PlayerStats() {
                   </div>
                 </div>
 
-                <div className="mt-4">
+                <div className="mt-3 sm:mt-4">
                   <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                     <div
                       className="absolute h-full rounded-full"
@@ -170,86 +213,31 @@ export function PlayerStats() {
 
           {playersList.length >= 2 && (
             <div className="space-y-6">
-              <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold dark:text-white">
+              <div className="rounded-lg bg-white p-4 shadow sm:p-6 dark:bg-gray-800">
+                <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold sm:mb-4 sm:text-xl dark:text-white">
                   <ChartBarIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                   Performance Comparison
                 </h3>
-                <div className="h-80">
-                  <Bar
-                    data={chartData}
-                    options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      scales: {
-                        y: {
-                          beginAtZero: true,
-                          grid: {
-                            color: 'rgba(156, 163, 175, 0.1)',
-                          },
-                          ticks: {
-                            color: 'rgb(156, 163, 175)',
-                          },
-                        },
-                        x: {
-                          grid: {
-                            color: 'rgba(156, 163, 175, 0.1)',
-                          },
-                          ticks: {
-                            color: 'rgb(156, 163, 175)',
-                          },
-                        },
-                      },
-                      plugins: {
-                        legend: {
-                          position: 'bottom',
-                          labels: {
-                            color: 'rgb(156, 163, 175)',
-                          },
-                        },
-                      },
-                    }}
-                  />
+                <div className="h-64 sm:h-80">
+                  <Bar data={chartData} options={chartOptions} />
                 </div>
               </div>
 
-              <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold dark:text-white">
+              <div className="rounded-lg bg-white p-4 shadow sm:p-6 dark:bg-gray-800">
+                <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold sm:mb-4 sm:text-xl dark:text-white">
                   <ChartBarIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                   Win Rate Comparison
                 </h3>
-                <div className="h-80">
+                <div className="h-64 sm:h-80">
                   <Bar
                     data={winRateChartData}
                     options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
+                      ...chartOptions,
                       scales: {
+                        ...chartOptions.scales,
                         y: {
-                          beginAtZero: true,
+                          ...chartOptions.scales.y,
                           max: 100,
-                          grid: {
-                            color: 'rgba(156, 163, 175, 0.1)',
-                          },
-                          ticks: {
-                            color: 'rgb(156, 163, 175)',
-                          },
-                        },
-                        x: {
-                          grid: {
-                            color: 'rgba(156, 163, 175, 0.1)',
-                          },
-                          ticks: {
-                            color: 'rgb(156, 163, 175)',
-                          },
-                        },
-                      },
-                      plugins: {
-                        legend: {
-                          position: 'bottom',
-                          labels: {
-                            color: 'rgb(156, 163, 175)',
-                          },
                         },
                       },
                     }}
@@ -257,46 +245,13 @@ export function PlayerStats() {
                 </div>
               </div>
 
-              <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold dark:text-white">
+              <div className="rounded-lg bg-white p-4 shadow sm:p-6 dark:bg-gray-800">
+                <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold sm:mb-4 sm:text-xl dark:text-white">
                   <ChartBarIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                   Average Round Score
                 </h3>
-                <div className="h-80">
-                  <Bar
-                    data={roundScoreChartData}
-                    options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      scales: {
-                        y: {
-                          beginAtZero: true,
-                          grid: {
-                            color: 'rgba(156, 163, 175, 0.1)',
-                          },
-                          ticks: {
-                            color: 'rgb(156, 163, 175)',
-                          },
-                        },
-                        x: {
-                          grid: {
-                            color: 'rgba(156, 163, 175, 0.1)',
-                          },
-                          ticks: {
-                            color: 'rgb(156, 163, 175)',
-                          },
-                        },
-                      },
-                      plugins: {
-                        legend: {
-                          position: 'bottom',
-                          labels: {
-                            color: 'rgb(156, 163, 175)',
-                          },
-                        },
-                      },
-                    }}
-                  />
+                <div className="h-64 sm:h-80">
+                  <Bar data={roundScoreChartData} options={chartOptions} />
                 </div>
               </div>
             </div>

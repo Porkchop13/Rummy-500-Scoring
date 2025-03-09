@@ -31,12 +31,12 @@ export function PlayerProfiles() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 p-6">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-2xl space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-2xl font-bold dark:text-white">Player Profiles</h2>
         <button
           onClick={handleClearStats}
-          className="inline-flex items-center rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
+          className="inline-flex w-full items-center justify-center rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 sm:w-auto"
           title="Reset all player statistics"
         >
           <ArrowPathIcon className="mr-2 h-5 w-5" />
@@ -44,7 +44,7 @@ export function PlayerProfiles() {
         </button>
       </div>
 
-      <form onSubmit={handleAddProfile} className="flex gap-2">
+      <form onSubmit={handleAddProfile} className="flex flex-col gap-2 sm:flex-row">
         <input
           ref={inputRef}
           type="text"
@@ -53,34 +53,36 @@ export function PlayerProfiles() {
           placeholder="Enter player name"
           className="flex-1 rounded-md border border-gray-300 px-4 py-2 text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500"
         />
-        <input
-          type="color"
-          value={newPlayerColor}
-          onChange={e => setNewPlayerColor(e.target.value)}
-          className="h-10 w-14 cursor-pointer rounded-md border-0"
-          title="Choose player color"
-        />
-        <button
-          type="submit"
-          disabled={!newPlayerName.trim()}
-          className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          <PlusIcon className="mr-2 h-5 w-5" />
-          Add Profile
-        </button>
+        <div className="flex gap-2">
+          <input
+            type="color"
+            value={newPlayerColor}
+            onChange={e => setNewPlayerColor(e.target.value)}
+            className="h-10 w-14 cursor-pointer rounded-md border-0"
+            title="Choose player color"
+          />
+          <button
+            type="submit"
+            disabled={!newPlayerName.trim()}
+            className="inline-flex flex-1 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50 sm:flex-initial"
+          >
+            <PlusIcon className="mr-2 h-5 w-5" />
+            Add Profile
+          </button>
+        </div>
       </form>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {Object.values(profiles).map(profile => (
           <div
             key={profile.id}
             className="flex items-start justify-between rounded-lg bg-white p-4 shadow dark:bg-gray-800"
           >
-            <div className="flex items-start space-x-3">
-              <UserCircleIcon className="h-6 w-6" style={{ color: profile.color || '#9ca3af' }} />
-              <div>
+            <div className="flex items-start space-x-3 overflow-hidden">
+              <UserCircleIcon className="h-6 w-6 flex-shrink-0" style={{ color: profile.color || '#9ca3af' }} />
+              <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-medium text-gray-900 dark:text-white">{profile.name}</h3>
+                  <h3 className="truncate font-medium text-gray-900 dark:text-white">{profile.name}</h3>
                   <input
                     type="color"
                     value={profile.color || '#9ca3af'}
@@ -99,7 +101,7 @@ export function PlayerProfiles() {
             </div>
             <button
               onClick={() => deleteProfile(profile.id)}
-              className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+              className="flex-shrink-0 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
             >
               <TrashIcon className="h-5 w-5" />
             </button>

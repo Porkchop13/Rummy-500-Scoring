@@ -170,7 +170,7 @@ export function Game() {
   const getScoreProgression = () => {
     if (!game || !game.rounds.length) return null;
 
-    const labels = game.rounds.map((_, index) => `Round ${index + 1}`);
+    const labels = game.rounds.map((_, index) => `R${index + 1}`);
     const datasets = game.players.map(player => {
       let runningTotal = 0;
       const data = game.rounds.map(round => {
@@ -207,12 +207,12 @@ export function Game() {
   const chartData = getScoreProgression();
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 p-6">
-      <div className="flex items-center justify-between">
-        <h2 className="mb-4 text-2xl font-bold dark:text-white">Current Game</h2>
+    <div className="mx-auto max-w-2xl space-y-6">
+      <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+        <h2 className="text-2xl font-bold dark:text-white">Current Game</h2>
         <button
           onClick={handleNewGameClick}
-          className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 sm:w-auto"
         >
           <PlusCircleIcon className="h-5 w-5" />
           New Game
@@ -220,8 +220,8 @@ export function Game() {
       </div>
 
       {showNewGameConfirm && (
-        <div className="bg-opacity-50 fixed inset-0 flex items-center justify-center bg-black">
-          <div className="mx-4 w-full max-w-sm rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black px-4">
+          <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
             <h3 className="mb-4 text-lg font-semibold dark:text-white">Start New Game?</h3>
             <p className="mb-6 text-gray-600 dark:text-gray-300">
               Starting a new game will end the current game. Are you sure you want to continue?
@@ -245,8 +245,8 @@ export function Game() {
       )}
 
       {winner && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="animate-bounce-slow mx-4 w-full max-w-sm rounded-lg bg-white p-8 text-center shadow-xl dark:bg-gray-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="animate-bounce-slow w-full max-w-sm rounded-lg bg-white p-8 text-center shadow-xl dark:bg-gray-800">
             <div className="mb-4 flex justify-center">
               <TrophyIcon className="h-16 w-16 text-yellow-400" />
             </div>
@@ -264,18 +264,18 @@ export function Game() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         {game.players.map(player => {
           const score = totalScores[player.id];
           const progressPercent = Math.min((score / WINNING_SCORE) * 100, 100);
 
           return (
-            <div key={player.id} className="rounded bg-gray-50 p-4 shadow-sm dark:bg-gray-800">
+            <div key={player.id} className="rounded bg-gray-50 p-3 shadow-sm sm:p-4 dark:bg-gray-800">
               <div className="flex items-center gap-2">
                 <UserCircleIcon className="h-5 w-5" style={{ color: player.color || '#9ca3af' }} />
-                <h3 className="font-semibold dark:text-white">{player.name}</h3>
+                <h3 className="truncate text-sm font-semibold sm:text-base dark:text-white">{player.name}</h3>
               </div>
-              <p className="mb-2 text-2xl dark:text-white">{score}</p>
+              <p className="mb-2 text-xl font-semibold sm:text-2xl dark:text-white">{score}</p>
               <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                 <div
                   className="absolute h-full rounded-full transition-all duration-500 ease-out"
@@ -305,7 +305,7 @@ export function Game() {
 
           <div
             className={`transition-all duration-300 ease-in-out ${
-              showChart ? 'h-[400px] p-4 opacity-100' : 'h-0 p-0 opacity-0'
+              showChart ? 'h-[300px] overflow-hidden p-4 opacity-100 sm:h-[400px]' : 'h-0 p-0 opacity-0'
             }`}
           >
             {showChart && (
@@ -330,6 +330,9 @@ export function Game() {
                       },
                       ticks: {
                         color: 'rgb(156, 163, 175)',
+                        font: {
+                          size: 10,
+                        },
                       },
                     },
                   },
@@ -337,7 +340,12 @@ export function Game() {
                     legend: {
                       position: 'bottom',
                       labels: {
+                        boxWidth: 12,
+                        padding: 10,
                         color: 'rgb(156, 163, 175)',
+                        font: {
+                          size: 11,
+                        },
                       },
                     },
                   },
@@ -368,7 +376,7 @@ export function Game() {
           <h3 className="mb-4 text-xl font-semibold dark:text-white">Round History</h3>
           <div className="space-y-2">
             {game.rounds.map((round, index) => (
-              <div key={round.id} className="rounded bg-gray-50 p-4 shadow-sm dark:bg-gray-800">
+              <div key={round.id} className="rounded bg-gray-50 p-3 shadow-sm sm:p-4 dark:bg-gray-800">
                 <div className="mb-2 flex items-center justify-between">
                   <h4 className="font-medium dark:text-white">Round {index + 1}</h4>
                   {editingRoundId !== round.id && (
@@ -387,7 +395,9 @@ export function Game() {
                         className="inline-block h-2 w-2 rounded-full"
                         style={{ backgroundColor: player.color || '#9ca3af' }}
                       />
-                      {player.name}: {round.scores[player.id] || 0}
+                      <span className="truncate">
+                        {player.name}: {round.scores[player.id] || 0}
+                      </span>
                     </div>
                   ))}
                 </div>
